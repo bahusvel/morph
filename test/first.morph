@@ -1,4 +1,0 @@
-import morph.rule as rule
-
-
-rule("if\s{anything:condition}$", "if\s({condition}) {")

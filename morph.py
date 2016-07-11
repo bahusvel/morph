@@ -1,4 +1,5 @@
 import re
+import os
 
 rules = []
 
@@ -37,7 +38,7 @@ class Rule:
 			self.tokentype = tokentype
 
 	def init_tokens(self):
-		from_input = re.findall("\{.+\}", self.input)
+		from_input = re.findall("(?<!\\\)\{\{.+\}\}", self.input)
 		for input_token in from_input:
 			token_name = input_token.strip("{}")
 			splits = token_name.split(":")
@@ -70,7 +71,5 @@ class Rule:
 def rule(input, output):
 	rules.append(Rule(input, output))
 
-Rule.TokenType.default_tokens.append(Rule.TokenType("anything", ".*"))
+Rule.TokenType.default_tokens.append(Rule.TokenType("anything", ".*?"))
 
-if __name__ == '__main__':
-	rule("if\s{anything:condition}$", "if\s({condition}) {")

@@ -1,7 +1,10 @@
-##include <stdlib.h>
-
 int main() {
-    if (1) {
-        printf("Hello world\n");
-    }
+
+if 1 {
+    return 1;
+} else {
+    return 0;
+}
+
+return 0;
 }
