@@ -9,7 +9,12 @@ setup(
 	author='Denis Lavrov',
 	author_email='bahus.vel@gmail.com',
 	url='https://github.com/bahusvel/morph',
-	modules=['morph', 'compiler'],
+	modules=['rules', 'compiler'],
 	provides=['morph'],
-	keywords=['meta', 'metaprogramming']
+	keywords=['meta', 'metaprogramming'],
+	install_requires=['Click'],
+	entry_points='''
+        [console_scripts]
+        morph=compiler:morph
+    ''',
 )

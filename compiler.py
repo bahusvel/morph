@@ -3,7 +3,6 @@ import re
 import os
 import sys
 import rules
-from rules import rule
 
 
 def get_rule_files(directory, found_files=None):
@@ -58,8 +57,7 @@ def load_rule_file(path):
 	if version[0] == 3:
 		if version[1] <= 4:
 			from importlib.machinery import SourceFileLoader
-			module = SourceFileLoader("module.name", path).load_module()
-			raise Exception("Python version <= 3.4 not supported")
+			SourceFileLoader("module.name", path).load_module()
 		elif version[1] >= 5:
 			import importlib.util
 			spec = importlib.util.spec_from_file_location("module.name", path)
@@ -69,9 +67,26 @@ def load_rule_file(path):
 		raise Exception("Python version != 3.X not supported")
 
 
+@click.group()
+def morph():
+	print("Welcome to Morph!")
+
 @click.command()
 @click.argument("directory", default=".")
-def morph(directory):
+def clean(directory):
+	directory = os.path.abspath(directory)
+	files = get_morph_files(directory)
+	for file in files:
+		file_name, _ = os.path.splitext(file)
+		if os.path.exists(file_name):
+			os.remove(file_name)
+
+
+@click.command()
+@click.argument("directory", default=".")
+@click.pass_context
+def compile(ctx, directory):
+	ctx.invoke(clean, directory)
 	directory = os.path.abspath(directory)
 	files = get_morph_files(directory)
 	print(files)
@@ -81,6 +96,10 @@ def morph(directory):
 		for rule_file in rule_files:
 			load_rule_file(rule_file)
 		process_file(file)
+
+
+morph.add_command(compile)
+morph.add_command(clean, name='clean')
 
 if __name__ == '__main__':
 	morph()
