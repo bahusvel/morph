@@ -71,8 +71,15 @@ class Rule:
 		self.generate_input_regex()
 
 
+def format(input, output):
+	pass
+
+
 def rule(input, output):
 	rules.append(Rule(input, output))
+
+def custom_rule():
+	pass
 
 Rule.TokenType.default_tokens.append(Rule.TokenType("anything", ".*?"))
 
