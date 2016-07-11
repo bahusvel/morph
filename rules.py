@@ -4,6 +4,10 @@ import os
 rules = []
 
 
+def escape(string):
+	return string.replace("\n", "\\n")
+
+
 class Rule:
 
 	class TokenType:
@@ -52,11 +56,10 @@ class Rule:
 		for token_instance in self.tokens:
 			regex = token_instance.generate_regex()
 			input_token = token_instance.generate_input_token()
-			self.input_regex = self.input_regex.replace(input_token, regex)
-			print(self.input_regex)
+			self.input_regex = self.input_regex.replace("{"+input_token+"}", regex)
 
-	def run_rule(self, file):
-		pass
+	def __repr__(self, *args, **kwargs):
+		return "(Rule: ({}) -> ({}))".format(escape(self.input_regex), escape(self.output))
 
 	def __init__(self, input, output, tokens=None):
 		super().__init__()

@@ -26,9 +26,7 @@ def get_morph_files(directory):
 	return f
 
 
-def process_file(path, file_rules=None):
-	if file_rules is None:
-		file_rules = rules.rules
+def process_file(path, file_rules):
 	file_name, extension = os.path.splitext(path)
 	if extension != ".morph":
 		print("ERROR File {} extension is not .morph, please use .morph".format(path))
@@ -40,11 +38,10 @@ def process_file(path, file_rules=None):
 	for file_rule in file_rules:
 		match = re.search(file_rule.input_regex, input_data, re.MULTILINE)
 		while match is not None:
-			print(match)
 			match_output = file_rule.output
 			for token in file_rule.tokens:
 				match_output = match_output.replace("{"+token.name+"}", match.group(token.name))
-			print(match_output)
+			print("{}: {} matched {} -> {}".format(input_data.count('\n', 0, match.start()) + 1, file_rule, rules.escape(match.group(0)), rules.escape(match_output)))
 			input_data = input_data[:match.start()] + match_output + input_data[match.end():]
 			match = re.search(file_rule.input_regex, input_data)
 	output_file.write(input_data)
@@ -71,6 +68,7 @@ def load_rule_file(path):
 def morph():
 	print("Welcome to Morph!")
 
+
 @click.command()
 @click.argument("directory", default=".")
 def clean(directory):
@@ -79,6 +77,7 @@ def clean(directory):
 	for file in files:
 		file_name, _ = os.path.splitext(file)
 		if os.path.exists(file_name):
+			print("Cleaned: {}".format(file_name))
 			os.remove(file_name)
 
 
@@ -86,16 +85,16 @@ def clean(directory):
 @click.argument("directory", default=".")
 @click.pass_context
 def compile(ctx, directory):
-	ctx.invoke(clean, directory)
+	ctx.invoke(clean, directory=directory)
 	directory = os.path.abspath(directory)
 	files = get_morph_files(directory)
-	print(files)
 	for file in files:
 		rule_files = get_rule_files(os.path.dirname(file))
 		rules.rules = []
 		for rule_file in rule_files:
 			load_rule_file(rule_file)
-		process_file(file)
+		print("Processing {} using {}:".format(file, rules.rules))
+		process_file(file, rules.rules)
 
 
 morph.add_command(compile)
